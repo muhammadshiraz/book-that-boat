@@ -66,22 +66,24 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
+    reservations: Reservation;
+    boats: Boat;
     media: Media;
     menu: Menu;
-    boats: Boat;
-    reservations: Reservation;
+    footer: Footer;
+    users: User;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
+    reservations: ReservationsSelect<false> | ReservationsSelect<true>;
+    boats: BoatsSelect<false> | BoatsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     menu: MenuSelect<false> | MenuSelect<true>;
-    boats: BoatsSelect<false> | BoatsSelect<true>;
-    reservations: ReservationsSelect<false> | ReservationsSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -120,57 +122,15 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "reservations".
  */
-export interface User {
+export interface Reservation {
   id: number;
-  role: 'admin' | 'user';
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  password?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "menu".
- */
-export interface Menu {
-  id: number;
-  logo: number | Media;
-  menu_items: {
-    label: string;
-    link: string;
-    id?: string | null;
-  }[];
-  book_now_button: {
-    label: string;
-    link: string;
-  };
+  boat: number | Boat;
+  user: number | User;
+  start_time: string;
+  end_time: string;
+  status?: ('pending' | 'confirmed' | 'cancelled') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -198,15 +158,81 @@ export interface Boat {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "reservations".
+ * via the `definition` "media".
  */
-export interface Reservation {
+export interface Media {
   id: number;
-  boat: number | Boat;
-  user: number | User;
-  start_time: string;
-  end_time: string;
-  status?: ('pending' | 'confirmed' | 'cancelled') | null;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  role: 'admin' | 'user';
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menu".
+ */
+export interface Menu {
+  id: number;
+  logo: number | Media;
+  menu_items: {
+    label: string;
+    link: string;
+    id?: string | null;
+  }[];
+  book_now_button: {
+    label: string;
+    link: string;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: number;
+  logo: number | Media;
+  footer_links: {
+    label: string;
+    link: string;
+    id?: string | null;
+  }[];
+  social_links?:
+    | {
+        platform: string;
+        icon: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  copyright: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -218,8 +244,12 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'reservations';
+        value: number | Reservation;
+      } | null)
+    | ({
+        relationTo: 'boats';
+        value: number | Boat;
       } | null)
     | ({
         relationTo: 'media';
@@ -230,12 +260,12 @@ export interface PayloadLockedDocument {
         value: number | Menu;
       } | null)
     | ({
-        relationTo: 'boats';
-        value: number | Boat;
+        relationTo: 'footer';
+        value: number | Footer;
       } | null)
     | ({
-        relationTo: 'reservations';
-        value: number | Reservation;
+        relationTo: 'users';
+        value: number | User;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -281,19 +311,37 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "reservations_select".
  */
-export interface UsersSelect<T extends boolean = true> {
-  role?: T;
+export interface ReservationsSelect<T extends boolean = true> {
+  boat?: T;
+  user?: T;
+  start_time?: T;
+  end_time?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "boats_select".
+ */
+export interface BoatsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  price_per_hour?: T;
+  capacity?: T;
+  location?: T;
+  media?: T;
+  available_times?:
+    | T
+    | {
+        start_time?: T;
+        end_time?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -337,37 +385,44 @@ export interface MenuSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "boats_select".
+ * via the `definition` "footer_select".
  */
-export interface BoatsSelect<T extends boolean = true> {
-  name?: T;
-  description?: T;
-  price_per_hour?: T;
-  capacity?: T;
-  location?: T;
-  media?: T;
-  available_times?:
+export interface FooterSelect<T extends boolean = true> {
+  logo?: T;
+  footer_links?:
     | T
     | {
-        start_time?: T;
-        end_time?: T;
+        label?: T;
+        link?: T;
         id?: T;
       };
+  social_links?:
+    | T
+    | {
+        platform?: T;
+        icon?: T;
+        url?: T;
+        id?: T;
+      };
+  copyright?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "reservations_select".
+ * via the `definition` "users_select".
  */
-export interface ReservationsSelect<T extends boolean = true> {
-  boat?: T;
-  user?: T;
-  start_time?: T;
-  end_time?: T;
-  status?: T;
+export interface UsersSelect<T extends boolean = true> {
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
