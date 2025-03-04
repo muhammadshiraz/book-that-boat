@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 export const Menu: CollectionConfig = {
-    slug: 'menu', // ✅ Slug must match this
+    slug: 'menu',
     access: { read: () => true },
     fields: [
       {

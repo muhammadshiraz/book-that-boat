@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Image from "next/image";
 import Header from "@/components/Header";
+import { getApiUrl } from "@/utils/api";
 
 // ✅ Define Boat Interface
 interface Boat {
@@ -12,7 +13,7 @@ interface Boat {
   price_per_hour: number;
   capacity: number;
   location: string;
-  media?: { 
+  media?: {
     id: number;
     url: string;
     alt?: string;
@@ -24,7 +25,7 @@ const useBoats = () => {
   return useQuery<Boat[]>({
     queryKey: ["boats"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/boats?limit=100");
+      const res = await axios.get(getApiUrl("/api/boats?limit=100"));
       return res.data.docs;
     },
   });
@@ -52,7 +53,7 @@ const Home: NextPage = () => {
               {/* ✅ Boat Image */}
               {boat.media?.url ? (
                 <Image
-                  src={`http://localhost:3000${boat.media.url}`}
+                  src={getApiUrl(boat.media.url)}
                   alt={boat.media.alt || "Boat Image"}
                   width={400}
                   height={250}

@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
+import Link from "next/link";
+import { getApiUrl } from "@/utils/api";
 
 // ✅ Define Menu Interface
 interface Menu {
@@ -14,7 +16,7 @@ const useMenu = () => {
   return useQuery<Menu>({
     queryKey: ["menu"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3000/api/menu?limit=1");
+      const res = await axios.get(getApiUrl("/api/menu?limit=1"));
       return res.data.docs[0];
     },
   });
@@ -30,35 +32,43 @@ const Header = () => {
   return (
     <header className="flex justify-between items-center px-6 py-4 bg-white shadow-md">
       {/* Logo */}
-      {menu?.logo && (
-        <Image
-          src={`http://localhost:3000${menu.logo.url}`}
-          alt="Logo"
-          width={81}
-          height={60}
-        />
-      )}
+      <Link href="/" legacyBehavior>
+        <a className="flex items-center">
+          {menu?.logo && (
+            <Image
+              src={getApiUrl(menu.logo.url)}
+              alt="Logo"
+              width={81}
+              height={60}
+              priority // Optimize loading
+              className="cursor-pointer"
+            />
+          )}
+        </a>
+      </Link>
 
       {/* Navigation */}
       <nav>
-        <ul className="flex space-x-6">
+        <ul className="hidden md:flex space-x-6">
           {menu?.menu_items.map((item, index) => (
             <li key={index}>
-              <a href={item.link} className="text-gray-700 hover:text-blue-500">
-                {item.label}
-              </a>
+              <Link href={item.link} legacyBehavior>
+                <a className="text-gray-700 hover:text-blue-500 transition">
+                  {item.label}
+                </a>
+              </Link>
             </li>
           ))}
         </ul>
       </nav>
 
       {/* Book Now Button */}
-      <a
-        href={menu?.book_now_button.link}
-        className="bg-blue-500 text-white px-5 py-2 rounded-md shadow-md hover:bg-blue-600"
-      >
-        {menu?.book_now_button.label}
-      </a>
+      {/* ✅ Book Now Button */}
+      <Link href={menu?.book_now_button.link || "#"} legacyBehavior>
+        <a className="bg-blue-500 text-white px-5 py-2 rounded-md shadow-md hover:bg-blue-600 transition">
+          {menu?.book_now_button.label}
+        </a>
+      </Link>
     </header>
   );
 };

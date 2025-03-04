@@ -2,6 +2,7 @@ import '@/styles/globals.css';
 import { AppProps } from 'next/app';
 import { DefaultSeo } from 'next-seo';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { getApiUrl } from "@/utils/api";
 
 // Create a QueryClient instance
 const queryClient = new QueryClient();
@@ -15,7 +16,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         openGraph={{
           type: 'website',
           locale: 'en_US',
-          url: 'http://localhost:3000',
+          url: `${process.env.NEXT_PUBLIC_API_URL}`,
           site_name: 'Book That Boat',
         }}
       />
