@@ -61,8 +61,7 @@ const Header = () => {
           ))}
         </ul>
       </nav>
-
-      {/* Book Now Button */}
+      
       {/* ✅ Book Now Button */}
       <Link href={menu?.book_now_button.link || "#"} legacyBehavior>
         <a className="bg-blue-500 text-white px-5 py-2 rounded-md shadow-md hover:bg-blue-600 transition">
